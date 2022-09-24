@@ -1,0 +1,144 @@
+<!-- <link rel="stylesheet" href="/index.css"> -->
+<style>
+main {
+    background-color: rgb(255,255,255);
+    height: 500px;
+    width: 400px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px 5px rgb(54,22,109);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+}
+.title {
+    font-size: 2em;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: rgb(48,48,48);
+}
+.text-section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+.text-title{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: rgb(36,36,36);
+    align-self: start;
+}
+.text{
+    height: 7rem;
+    width: 20rem;
+    border: none;
+    outline: 2px solid rgba(128,128,128,0.623);
+    border-radius: 0.5rem;
+    resize: none;
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 8px 10px;
+}
+.voice-section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+.voice-title{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: rgb(36,36,36);
+    align-self: start;
+} 
+#voice{
+    height: 3rem;
+    width: 20rem;
+    border: none;
+    outline: 2px solid rgba(128,128,128,0.623);
+    border-radius: 0.4rem;
+    padding: 0px 10px;
+}
+.submit{
+    background-color: rgba(92,55,225,0.979);
+    color: white;
+    width: 20rem;
+    height: 3rem;
+    border-radius: 0.3rem;
+    font-size: 1.2rem;
+    border: none;
+}
+</style>
+<script>
+    const textarea = document.querySelector('#text')
+        let voicelist = document.querySelector('#voice')
+        let speechbtn = document.querySelector('.submit')
+        
+        let synth = speechSynthesis
+        let isSpeaking = true
+        
+        function voiceSpeech(){
+            for (let voice of synth.getVoices()){
+                let option = document.createElement('option')
+                option.text = voice.name
+                voicelist.add(option)   //Add the voice name in the Voice list
+                console.log(option) //Show the Option in the Console
+            }
+        }
+        synth.addEventListener('voiceChanged', voiceSpeech)
+
+        function textToSpeech(){
+            let utterance = new SpeechSynthesisUtterance(text)
+            for (let voice of synth.getVoices()){
+                if (voice.name == voicelist.value){
+                    utterance.voice=voice
+                }
+            }
+            speechSynthesis.speak(utterance)
+        } 
+speechbtn.addEventListener('click', (e) => {
+    e.preventDefault()
+    if (textarea.value =! '') {
+        if (!synth.speaking) {
+            textToSpeech(textarea.value)
+        }
+        if (textarea.value.length > 80) {
+            if (isSpeaking) {
+                    synth.resume()
+                    isSpeaking = false
+                    speechbtn.innerHTML = 'Pause Speech'
+            }
+            else {
+                    synth.pause()
+                    isSpeaking = true
+                    speechbtn.innerHTML = 'Resume Speech'
+            }
+            setInterval(() => {
+                if (!synth.speaking && !isSpeaking) {
+                        isSpeaking = true
+                        speechbtn.innerHTML = 'Convert To Speech' 
+                }
+            })
+        } else {
+                speechbtn.innerHTML = 'Convert To Speech'
+            }
+    }
+})
+</script>
+<main>
+    <p class="title"> Text to Speech</p>
+    <div class="text-section">
+        <p class="text-title"> Enter Text</p>
+        <textarea name="" id="text"></textarea>
+    </div>
+    <div class="voic-section">
+        <p class="voice-title">Select Voice</p>
+        <select name="" id="voice">
+            <option value="Google US English">Google US English</option>
+        </select>
+    </div>
+    <button class="submit">Convert to Speech</button>
+</main>
